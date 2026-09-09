@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-
+import LandingPage from '@/views/LandingPage.vue'
+import Onboarding from '@/views/Onboarding.vue'
+import StepProfile from '@/views/StepProfile.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,22 +9,16 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: LandingPage
+      component: Onboarding
+    }
+   ,
+    {
+      path: '/onboarding-profile',
+      name: 'onboarding-profile',
+      component: StepProfile
     }
    
   ]
-})
-
-router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
-
-  const isAuthenticated = !!authStore.token
-
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    return next('/login')
-  }
-
-  next()
 })
 
 export default router
