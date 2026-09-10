@@ -18,7 +18,7 @@ const currentStep = computed(() => steps.find((s) => s.name === route.name)?.n ?
   <div class="onboard-shell">
     <div class="onboard-card">
       <div class="onboard-card__header">
-        <img src="@/assets/images/paratus-pay-logo-removebg-preview.png" alt="ParatusPay" class="onboard-card__logo" />
+        <img src="@/assets/images/paratus-pay-logo.png" alt="ParatusPay" class="onboard-card__logo rounded-md" />
         <h1>Create your profile</h1>
         <p>Your account starts here</p>
 

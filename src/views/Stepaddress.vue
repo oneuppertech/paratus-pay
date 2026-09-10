@@ -26,14 +26,19 @@ function validate() {
   return Object.keys(errors).length === 0
 }
 
+// async function handleSubmit() {
+//   if (!validate()) return
+//   submitting.value = true
+//   const result = await auth.submitAddress(form)
+//   submitting.value = false
+//   if (result.success) {
+//     router.push({ name: 'onboarding-verify' })
+//   }
+// }
 async function handleSubmit() {
-  if (!validate()) return
-  submitting.value = true
-  const result = await auth.submitAddress(form)
-  submitting.value = false
-  if (result.success) {
+
     router.push({ name: 'onboarding-verify' })
-  }
+ 
 }
 </script>
 
@@ -101,7 +106,7 @@ async function handleSubmit() {
       </div>
 
       <div class="step-actions">
-        <button type="submit" class="btn-primary" :disabled="submitting">
+        <button type="submit" class="btn-primary">
           <span v-if="!submitting">Continue to verification</span>
           <i v-else class="fa-solid fa-circle-notch fa-spin" />
           <i v-if="!submitting" class="fa-solid fa-arrow-right" />

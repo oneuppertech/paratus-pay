@@ -120,7 +120,7 @@ function handleContinue() {
     </p>
 
     <div class="step-actions">
-      <button type="button" class="btn-primary" :disabled="!canContinue" @click="handleContinue">
+      <button type="button" class="btn-primary" @click="handleContinue">
         <span>Continue to address</span>
         <i class="fa-solid fa-arrow-right" />
       </button>

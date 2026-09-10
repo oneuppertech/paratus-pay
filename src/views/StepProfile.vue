@@ -46,21 +46,26 @@ function validate() {
   return Object.keys(errors).length === 0
 }
 
+// async function handleSubmit() {
+//   if (!validate()) return
+
+//   submitting.value = true
+//   const result = await auth.registerProfile({
+//     phoneNumber: form.phoneNumber,
+//     email: form.email,
+//     dateOfBirth: form.dateOfBirth,
+//     password: form.password
+//   })
+//   submitting.value = false
+
+//   if (result.success) {
+//     router.push({ name: 'onboarding-identity' })
+//   }
+// }
 async function handleSubmit() {
-  if (!validate()) return
-
-  submitting.value = true
-  const result = await auth.registerProfile({
-    phoneNumber: form.phoneNumber,
-    email: form.email,
-    dateOfBirth: form.dateOfBirth,
-    password: form.password
-  })
-  submitting.value = false
-
-  if (result.success) {
+ 
     router.push({ name: 'onboarding-identity' })
-  }
+ 
 }
 </script>
 
@@ -161,7 +166,7 @@ async function handleSubmit() {
 
     <p class="step-subtitle" style="text-align: center; margin-top: 18px">
       Already have an account?
-      <router-link :to="{ name: 'login' }" class="btn-link">Back to login</router-link>
+      <router-link to="/" class="btn-link">Back to login</router-link>
     </p>
   </div>
 </template>
