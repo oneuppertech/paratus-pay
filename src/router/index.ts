@@ -7,6 +7,8 @@ import StepProfile from '@/views/StepProfile.vue'
 import StepIdentity from '@/views/StepIdentity.vue'
 import Stepaddress from '@/views/Stepaddress.vue'
 import Stepverify from '@/views/Stepverify.vue'
+import AdminExchange from '@/views/AdminExchange.vue'
+import CustomerExchange from '@/views/CustomerExchange.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +19,16 @@ const router = createRouter({
       path: '/landing',
       name: 'landing',
       component: LandingPage,
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: AdminExchange,
+    },
+    {
+      path: '/customer',
+      name: 'customer',
+      component: CustomerExchange,
     },
 
     // Onboarding
