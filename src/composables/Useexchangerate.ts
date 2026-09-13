@@ -36,7 +36,7 @@ export const useExchangeRates = () => {
         .select('*')
         .eq('is_active', true)
         .order('from_currency', { ascending: true })
-
+      console.log("currency pair:", data)
       if (err) throw err
       currencyPairs.value = data || []
     } catch (err) {
@@ -58,7 +58,7 @@ export const useExchangeRates = () => {
         .eq('rate_date', date)
         .eq('is_active', true)
         .order('counterparty_id', { ascending: true })
-
+        console.log("exchange rates:", data)
       if (err) throw err
       rates.value = data || []
     } catch (err) {
@@ -228,8 +228,51 @@ export const useExchangeRates = () => {
       throw err
     }
   }
+  // Upload counterparty logo, returns public URL
+const uploadCounterpartyLogo = async (file, counterpartyId = null) => {
+  try {
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${counterpartyId || crypto.randomUUID()}-${Date.now()}.${fileExt}`
+    const filePath = `${fileName}`
+
+    const { data, error: err } = await supabase.storage
+      .from('counterparty-logos')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+
+    if (err) throw err
+
+    const { data: urlData } = supabase.storage
+      .from('counterparty-logos')
+      .getPublicUrl(filePath)
+
+    return urlData.publicUrl
+  } catch (err) {
+    error.value = err.message
+    throw err
+  }
+}
+
+// Optional: delete old logo when replacing/removing
+const deleteCounterpartyLogo = async (logoUrl) => {
+  try {
+    if (!logoUrl) return
+    const path = logoUrl.split('/counterparty-logos/')[1]
+    if (!path) return
+    const { error: err } = await supabase.storage
+      .from('counterparty-logos')
+      .remove([path])
+    if (err) throw err
+  } catch (err) {
+    console.error('Error deleting logo:', err)
+  }
+}
 
   return {
+    uploadCounterpartyLogo,
+    deleteCounterpartyLogo,
     rates,
     counterparties,
     currencyPairs,

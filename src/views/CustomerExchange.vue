@@ -9,9 +9,16 @@
           </div>
           <div>
             <h1 class="text-3xl font-bold text-gray-900">Exchange Rates</h1>
-            <p class="text-gray-600">Compare and send money with the best rates</p>
+            <p class="text-gray-600">Compare our rates with your favourite apps below and see the difference</p>
           </div>
         </div>
+      </div>
+
+      <!-- Rate Date -->
+      <div class="bg-white rounded-lg shadow-sm p-4 mb-6 text-center">
+        <p class="text-sm text-gray-600">
+          Rates effective <span class="font-semibold text-gray-900">{{ formatDate(selectedDate) }}</span>
+        </p>
       </div>
 
       <!-- Send Money Direction Tabs -->
@@ -42,12 +49,7 @@
         </div>
       </div>
 
-      <!-- Rate Date -->
-      <div class="bg-white rounded-lg shadow-sm p-4 mb-6 text-center">
-        <p class="text-sm text-gray-600">
-          Rates effective <span class="font-semibold text-gray-900">{{ formatDate(selectedDate) }}</span>
-        </p>
-      </div>
+      
 
       <!-- Currency Converter -->
       <div class="bg-white rounded-lg shadow-lg p-6 mb-8">

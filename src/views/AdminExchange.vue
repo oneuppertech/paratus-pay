@@ -11,7 +11,7 @@
       <div class="date-picker-compact">
         <v-card flat border>
           <v-card-text class="pa-2">
-            <div class="d-flex align-center gap-2">
+            <div class="d-flex align-center gap-6">
               <span class="text-caption font-weight-bold">Date:</span>
               <v-menu>
                 <template v-slot:activator="{ props }">
@@ -725,13 +725,21 @@
             </v-col>
 
             <v-col cols="12">
-              <v-text-field
-                v-model="counterpartyForm.logo_url"
-                label="Logo URL"
-                type="url"
-                variant="outlined"
-              ></v-text-field>
-            </v-col>
+  <div class="d-flex align-center gap-4 mb-2">
+    <v-avatar v-if="logoPreview" :image="logoPreview" size="64"></v-avatar>
+    <v-icon v-else size="64" class="text-medium-emphasis">mdi-bank-outline</v-icon>
+    <v-file-input
+      v-model="logoFile"
+      label="Logo"
+      accept="image/*"
+      prepend-icon="mdi-camera"
+      variant="outlined"
+      density="compact"
+      @update:model-value="handleLogoChange"
+      hide-details
+    ></v-file-input>
+  </div>
+</v-col>
 
             <v-col cols="12">
               <v-textarea
@@ -899,7 +907,8 @@ const {
   updateCounterparty,
   deleteCounterparty,
   createCurrencyPair,
-  deleteCurrencyPair
+  deleteCurrencyPair,
+  uploadCounterpartyLogo
 } = useExchangeRates()
 
 // UI State
@@ -1000,7 +1009,7 @@ const openRateForm = () => {
     counterparty_id: '',
     currency_pair_id: '',
     rate: null,
-    direction: 'BOTH'
+    direction: ''
   }
   showRateFormDialog.value = true
 }
@@ -1056,16 +1065,23 @@ const confirmDeleteRate = (rate: any) => {
   showDeleteConfirm.value = true
   showRateDetail.value = false
 }
+const logoFile = ref<File | null>(null)
+const logoPreview = ref<string | null>(null)
 
+const handleLogoChange = (file: File | File[] | null) => {
+  const f = Array.isArray(file) ? file[0] : file
+  if (f) {
+    logoPreview.value = URL.createObjectURL(f)
+  } else {
+    logoPreview.value = null
+  }
+}
 // Counterparty Methods
 const openCounterpartyForm = () => {
   editingCounterpartyId.value = null
-  counterpartyForm.value = {
-    name: '',
-    logo_url: '',
-    description: '',
-    priority: 1
-  }
+  counterpartyForm.value = { name: '', logo_url: '', description: '', priority: 1 }
+  logoFile.value = null
+  logoPreview.value = null
   showCounterpartyFormDialog.value = true
 }
 
@@ -1077,6 +1093,8 @@ const editCounterparty = (cp: any) => {
     description: cp.description || '',
     priority: cp.priority
   }
+  logoFile.value = null
+  logoPreview.value = cp.logo_url || null
   showCounterpartyFormDialog.value = true
   showCounterpartyDetail.value = false
 }
@@ -1084,14 +1102,27 @@ const editCounterparty = (cp: any) => {
 const closeCounterpartyForm = () => {
   showCounterpartyFormDialog.value = false
   editingCounterpartyId.value = null
+  logoFile.value = null
+  logoPreview.value = null
 }
+
+
+
 
 const saveCounterparty = async () => {
   try {
+    let logoUrl = counterpartyForm.value.logo_url
+
+    if (logoFile.value) {
+      logoUrl = await uploadCounterpartyLogo(logoFile.value, editingCounterpartyId.value)
+    }
+
+    const payload = { ...counterpartyForm.value, logo_url: logoUrl }
+
     if (editingCounterpartyId.value) {
-      await updateCounterparty(editingCounterpartyId.value, counterpartyForm.value)
+      await updateCounterparty(editingCounterpartyId.value, payload)
     } else {
-      await createCounterparty(counterpartyForm.value)
+      await createCounterparty(payload)
     }
     await fetchCounterparties()
     closeCounterpartyForm()
