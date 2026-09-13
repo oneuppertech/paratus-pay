@@ -4,9 +4,11 @@
     <div class="exchange-rate-header">
       <div>
         <h1 class="text-h4 font-weight-bold">Exchange Rates</h1>
-        <p class="text-subtitle2 text-medium-emphasis">Compare and send money with the best rates</p>
+        <p class="text-subtitle2 text-medium-emphasis">
+          Compare and send money with the best rates
+        </p>
       </div>
-      
+
       <!-- Compact Date Picker (Top Right) -->
       <div class="date-picker-compact">
         <v-card flat border>
@@ -24,7 +26,7 @@
                   ></v-btn>
                 </template>
                 <v-date-picker
-                color="red"
+                  color="red"
                   v-model="selectedDate"
                   @update:model-value="fetchRatesByDate"
                 ></v-date-picker>
@@ -96,37 +98,25 @@
             >
               <v-card-item>
                 <div class="d-flex justify-space-between align-start">
-                  <div class="flex-grow-1">
-                    <div class="text-subtitle2 font-weight-bold">
-                      {{ rate.counterparty?.name }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      {{ rate.currency_pair?.from_currency }} → {{ rate.currency_pair?.to_currency }}
+                  <div class="d-flex align-center gap-3 flex-grow-1">
+                    <v-avatar
+                      v-if="rate.counterparty?.logo_url"
+                      :image="rate.counterparty.logo_url"
+                      size="36"
+                    ></v-avatar>
+                    <v-icon v-else size="36" class="text-medium-emphasis">
+                      mdi-bank-outline
+                    </v-icon>
+                    <div>
+                      <div class="text-subtitle2 font-weight-bold">
+                        {{ rate.counterparty?.name }}
+                      </div>
+                      <div class="text-caption text-medium-emphasis">
+                        {{ rate.currency_pair?.from_currency }} →
+                        {{ rate.currency_pair?.to_currency }}
+                      </div>
                     </div>
                   </div>
-                  <v-menu>
-                    <template v-slot:activator="{ props }">
-                      <v-btn
-                        v-bind="props"
-                        icon="mdi-dots-vertical"
-                        size="small"
-                        variant="text"
-                        @click.stop
-                      ></v-btn>
-                    </template>
-                    <v-list>
-                      <v-list-item
-                        prepend-icon="mdi-pencil"
-                        title="Edit"
-                        @click="editRate(rate)"
-                      ></v-list-item>
-                      <v-list-item
-                        prepend-icon="mdi-delete"
-                        title="Delete"
-                        @click="confirmDeleteRate(rate)"
-                      ></v-list-item>
-                    </v-list>
-                  </v-menu>
                 </div>
               </v-card-item>
 
@@ -134,12 +124,7 @@
                 <div class="rate-value mb-3">
                   <span class="text-h5 font-weight-bold">{{ rate.rate.toFixed(4) }}</span>
                 </div>
-                <v-chip
-                  :color="directionColor(rate.direction)"
-                  size="small"
-                  label
-                  class="mb-2"
-                >
+                <v-chip :color="directionColor(rate.direction)" size="small" label class="mb-2">
                   {{ rate.direction }}
                 </v-chip>
               </v-card-text>
@@ -334,11 +319,7 @@
       <v-card v-if="selectedRate">
         <v-card-item>
           <template v-slot:prepend>
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              @click="showRateDetail = false"
-            ></v-btn>
+            <v-btn icon="mdi-close" variant="text" @click="showRateDetail = false"></v-btn>
           </template>
           <v-card-title>{{ selectedRate.counterparty?.name }}</v-card-title>
         </v-card-item>
@@ -376,10 +357,7 @@
               <v-col cols="12">
                 <div class="info-row">
                   <span class="label">Direction</span>
-                  <v-chip
-                    :color="directionColor(selectedRate.direction)"
-                    size="small"
-                  >
+                  <v-chip :color="directionColor(selectedRate.direction)" size="small">
                     {{ selectedRate.direction }}
                   </v-chip>
                 </div>
@@ -426,11 +404,7 @@
       <v-card v-if="selectedCounterparty">
         <v-card-item>
           <template v-slot:prepend>
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              @click="showCounterpartyDetail = false"
-            ></v-btn>
+            <v-btn icon="mdi-close" variant="text" @click="showCounterpartyDetail = false"></v-btn>
           </template>
           <v-card-title>{{ selectedCounterparty.name }}</v-card-title>
         </v-card-item>
@@ -445,9 +419,7 @@
               :image="selectedCounterparty.logo_url"
               size="80"
             ></v-avatar>
-            <v-icon v-else size="80" class="text-medium-emphasis">
-              mdi-bank-outline
-            </v-icon>
+            <v-icon v-else size="80" class="text-medium-emphasis"> mdi-bank-outline </v-icon>
           </div>
 
           <!-- Information Section -->
@@ -509,7 +481,9 @@
                 block
                 :prepend-icon="selectedCounterparty.is_active ? 'mdi-pause' : 'mdi-play'"
                 variant="tonal"
-                @click="toggleCounterpartyActive(selectedCounterparty.id, !selectedCounterparty.is_active)"
+                @click="
+                  toggleCounterpartyActive(selectedCounterparty.id, !selectedCounterparty.is_active)
+                "
               >
                 {{ selectedCounterparty.is_active ? 'deactivate' : 'activate' }}
               </v-btn>
@@ -535,11 +509,7 @@
       <v-card v-if="selectedPair">
         <v-card-item>
           <template v-slot:prepend>
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              @click="showPairDetail = false"
-            ></v-btn>
+            <v-btn icon="mdi-close" variant="text" @click="showPairDetail = false"></v-btn>
           </template>
           <v-card-title>
             {{ selectedPair.from_currency }} → {{ selectedPair.to_currency }}
@@ -617,13 +587,11 @@
     <v-dialog v-model="showRateFormDialog" max-width="600">
       <v-card>
         <v-card-item>
-          <v-card-title>{{ editingRateId ? 'Edit Exchange Rate' : 'Create New Exchange Rate' }}</v-card-title>
+          <v-card-title>{{
+            editingRateId ? 'Edit Exchange Rate' : 'Create New Exchange Rate'
+          }}</v-card-title>
           <template v-slot:append>
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              @click="closeRateForm"
-            ></v-btn>
+            <v-btn icon="mdi-close" variant="text" @click="closeRateForm"></v-btn>
           </template>
         </v-card-item>
 
@@ -678,13 +646,7 @@
 
         <v-card-actions class="pa-6">
           <v-spacer></v-spacer>
-          <v-btn
-            variant="text"
-            @click="closeRateForm"
-            class="text-lowercase"
-          >
-            cancel
-          </v-btn>
+          <v-btn variant="text" @click="closeRateForm" class="text-lowercase"> cancel </v-btn>
           <v-btn
             color="#DC2626"
             variant="flat"
@@ -702,13 +664,11 @@
     <v-dialog v-model="showCounterpartyFormDialog" max-width="600">
       <v-card>
         <v-card-item>
-          <v-card-title>{{ editingCounterpartyId ? 'edit counterparty' : 'Create New Counterparty' }}</v-card-title>
+          <v-card-title>{{
+            editingCounterpartyId ? 'edit counterparty' : 'Create New Counterparty'
+          }}</v-card-title>
           <template v-slot:append>
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              @click="closeCounterpartyForm"
-            ></v-btn>
+            <v-btn icon="mdi-close" variant="text" @click="closeCounterpartyForm"></v-btn>
           </template>
         </v-card-item>
 
@@ -725,21 +685,21 @@
             </v-col>
 
             <v-col cols="12">
-  <div class="d-flex align-center gap-4 mb-2">
-    <v-avatar v-if="logoPreview" :image="logoPreview" size="64"></v-avatar>
-    <v-icon v-else size="64" class="text-medium-emphasis">mdi-bank-outline</v-icon>
-    <v-file-input
-      v-model="logoFile"
-      label="Logo"
-      accept="image/*"
-      prepend-icon="mdi-camera"
-      variant="outlined"
-      density="compact"
-      @update:model-value="handleLogoChange"
-      hide-details
-    ></v-file-input>
-  </div>
-</v-col>
+              <div class="d-flex align-center gap-4 mb-2">
+                <v-avatar v-if="logoPreview" :image="logoPreview" size="64"></v-avatar>
+                <v-icon v-else size="64" class="text-medium-emphasis">mdi-bank-outline</v-icon>
+                <v-file-input
+                  v-model="logoFile"
+                  label="Logo"
+                  accept="image/*"
+                  prepend-icon="mdi-camera"
+                  variant="outlined"
+                  density="compact"
+                  @update:model-value="handleLogoChange"
+                  hide-details
+                ></v-file-input>
+              </div>
+            </v-col>
 
             <v-col cols="12">
               <v-textarea
@@ -765,11 +725,7 @@
 
         <v-card-actions class="pa-6">
           <v-spacer></v-spacer>
-          <v-btn
-            variant="text"
-            @click="closeCounterpartyForm"
-            class="text-lowercase"
-          >
+          <v-btn variant="text" @click="closeCounterpartyForm" class="text-lowercase">
             cancel
           </v-btn>
           <v-btn
@@ -789,13 +745,11 @@
     <v-dialog v-model="showPairFormDialog" max-width="600">
       <v-card>
         <v-card-item>
-          <v-card-title>{{ editingPairId ? 'Edit Currency Pair' : 'Create New Currency Pair' }}</v-card-title>
+          <v-card-title>{{
+            editingPairId ? 'Edit Currency Pair' : 'Create New Currency Pair'
+          }}</v-card-title>
           <template v-slot:append>
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              @click="closePairForm"
-            ></v-btn>
+            <v-btn icon="mdi-close" variant="text" @click="closePairForm"></v-btn>
           </template>
         </v-card-item>
 
@@ -829,13 +783,7 @@
 
         <v-card-actions class="pa-6">
           <v-spacer></v-spacer>
-          <v-btn
-            variant="text"
-            @click="closePairForm"
-            class="text-lowercase"
-          >
-            cancel
-          </v-btn>
+          <v-btn variant="text" @click="closePairForm" class="text-lowercase"> cancel </v-btn>
           <v-btn
             color="#DC2626"
             variant="flat"
@@ -866,19 +814,10 @@
 
         <v-card-actions class="pa-6">
           <v-spacer></v-spacer>
-          <v-btn
-            variant="text"
-            @click="showDeleteConfirm = false"
-            :disabled="deleteLoading"
-          >
+          <v-btn variant="text" @click="showDeleteConfirm = false" :disabled="deleteLoading">
             Cancel
           </v-btn>
-          <v-btn
-            color="error"
-            variant="flat"
-            :loading="deleteLoading"
-            @click="performDelete"
-          >
+          <v-btn color="error" variant="flat" :loading="deleteLoading" @click="performDelete">
             Delete
           </v-btn>
         </v-card-actions>
@@ -1106,9 +1045,6 @@ const closeCounterpartyForm = () => {
   logoPreview.value = null
 }
 
-
-
-
 const saveCounterparty = async () => {
   try {
     let logoUrl = counterpartyForm.value.logo_url
@@ -1242,11 +1178,7 @@ onMounted(async () => {
     String(today.getDate()).padStart(2, '0')
   ].join('-')
 
-  await Promise.all([
-    fetchCounterparties(),
-    fetchCurrencyPairs(),
-    fetchRatesByDate()
-  ])
+  await Promise.all([fetchCounterparties(), fetchCurrencyPairs(), fetchRatesByDate()])
 })
 </script>
 
@@ -1264,7 +1196,7 @@ onMounted(async () => {
   align-items: flex-start;
   gap: 2rem;
   flex-wrap: wrap;
-  
+
   h1 {
     margin-bottom: 0.5rem;
   }
@@ -1273,7 +1205,7 @@ onMounted(async () => {
 .date-picker-compact {
   flex-shrink: 0;
   min-width: 300px;
-  
+
   .v-card {
     box-shadow: none;
     border: 1px solid rgba(0, 0, 0, 0.12);
@@ -1343,8 +1275,6 @@ onMounted(async () => {
     color: rgba(0, 0, 0, 0.87);
   }
 }
-
-
 
 :deep(.v-btn) {
   text-transform: none;
