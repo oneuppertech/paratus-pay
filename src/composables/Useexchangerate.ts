@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { supabase } from '@/services/supabase'
+
 export const useExchangeRates = () => {
   // State
   const rates = ref([])
@@ -17,7 +18,7 @@ export const useExchangeRates = () => {
         .from('counterparties')
         .select('*')
         .order('priority', { ascending: true })
-        console.log("counterparties:", data)
+      console.log("counterparties:", data)
       if (err) throw err
       counterparties.value = data || []
     } catch (err) {
@@ -125,6 +126,23 @@ export const useExchangeRates = () => {
     }
   }
 
+  // Delete exchange rate
+  const deleteRate = async (id) => {
+    try {
+      const { error: err } = await supabase
+        .from('exchange_rates')
+        .delete()
+        .eq('id', id)
+
+      if (err) throw err
+      // Remove from local state
+      rates.value = rates.value.filter(r => r.id !== id)
+    } catch (err) {
+      error.value = err.message
+      throw err
+    }
+  }
+
   // Create counterparty
   const createCounterparty = async (payload) => {
     try {
@@ -135,6 +153,40 @@ export const useExchangeRates = () => {
 
       if (err) throw err
       return data?.[0]
+    } catch (err) {
+      error.value = err.message
+      throw err
+    }
+  }
+
+  // Update counterparty
+  const updateCounterparty = async (id, updates) => {
+    try {
+      const { data, error: err } = await supabase
+        .from('counterparties')
+        .update(updates)
+        .eq('id', id)
+        .select()
+
+      if (err) throw err
+      return data?.[0]
+    } catch (err) {
+      error.value = err.message
+      throw err
+    }
+  }
+
+  // Delete counterparty
+  const deleteCounterparty = async (id) => {
+    try {
+      const { error: err } = await supabase
+        .from('counterparties')
+        .delete()
+        .eq('id', id)
+
+      if (err) throw err
+      // Remove from local state
+      counterparties.value = counterparties.value.filter(c => c.id !== id)
     } catch (err) {
       error.value = err.message
       throw err
@@ -160,6 +212,23 @@ export const useExchangeRates = () => {
     }
   }
 
+  // Delete currency pair
+  const deleteCurrencyPair = async (id) => {
+    try {
+      const { error: err } = await supabase
+        .from('currency_pairs')
+        .delete()
+        .eq('id', id)
+
+      if (err) throw err
+      // Remove from local state
+      currencyPairs.value = currencyPairs.value.filter(p => p.id !== id)
+    } catch (err) {
+      error.value = err.message
+      throw err
+    }
+  }
+
   return {
     rates,
     counterparties,
@@ -174,7 +243,11 @@ export const useExchangeRates = () => {
     getRate,
     createRate,
     updateRate,
+    deleteRate,
     createCounterparty,
-    createCurrencyPair
+    updateCounterparty,
+    deleteCounterparty,
+    createCurrencyPair,
+    deleteCurrencyPair
   }
 }
