@@ -3,6 +3,7 @@
     <div class="max-w-7xl mx-auto px-4">
       <!-- Header -->
       <div class="mb-8">
+        <img src="../assets/paratus-logo.png" class="w-25" alt="">
         <div class="flex items-center gap-3 mb-4">
           
           <div>
