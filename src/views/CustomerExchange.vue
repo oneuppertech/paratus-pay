@@ -4,12 +4,12 @@
       <!-- Header -->
       <div class="mb-8">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-12 h-12 bg-red-600 rounded flex items-center justify-center">
-            <span class="text-white font-bold text-xl">P</span>
-          </div>
+          
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">Exchange Rates</h1>
-            <p class="text-gray-600">Compare our rates with your favourite apps below and see the difference</p>
+            <h1 class="text-xl font-bold text-gray-900">Exchange Rates</h1>
+            <p class="text-gray-600">
+              Compare our rates with your favourite apps below and see the difference
+            </p>
           </div>
         </div>
       </div>
@@ -17,7 +17,8 @@
       <!-- Rate Date -->
       <div class="bg-white rounded-lg shadow-sm p-4 mb-6 text-center">
         <p class="text-sm text-gray-600">
-          Rates effective <span class="font-semibold text-gray-900">{{ formatDate(selectedDate) }}</span>
+          Rates effective
+          <span class="font-semibold text-gray-900">{{ formatDate(selectedDate) }}</span>
         </p>
       </div>
 
@@ -49,7 +50,185 @@
         </div>
       </div>
 
-      
+      <!-- Exchange Rates by Counterparty -->
+      <div v-if="loading" class="text-center py-12">
+        <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+      </div>
+
+      <div v-else-if="filteredRatesByCounterparty.length" class="space-y-6">
+        
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Counterparty Card -->
+          <div
+            v-for="group in filteredRatesByCounterparty"
+            :key="group.counterparty.id"
+            :class="[
+              'rounded-xl overflow-hidden transition-all duration-300',
+
+              isMainCounterparty(group.counterparty.id)
+                ? 'bg-white shadow-xl border-2 border-red-600'
+                : 'bg-gray-100 border border-gray-200 opacity-60'
+            ]"
+          >
+            <!-- ========================================= -->
+            <!-- HEADER -->
+            <!-- ========================================= -->
+
+            <div
+              :class="[
+                'p-5',
+
+                isMainCounterparty(group.counterparty.id)
+                  ? 'bg-gradient-to-r from-red-600 to-red-700 text-white'
+                  : 'bg-gray-400 text-white'
+              ]"
+            >
+              <div class="flex items-center gap-3">
+                <!-- Logo -->
+                <div
+                  class="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-white"
+                >
+                  <img
+                    v-if="group.counterparty.logo_url"
+                    :src="group.counterparty.logo_url"
+                    :alt="group.counterparty.name"
+                    class="w-full h-full object-contain p-1"
+                  />
+
+                  <span v-else class="text-gray-500 font-bold text-lg">
+                    {{ group.counterparty.name?.charAt(0) }}
+                  </span>
+                </div>
+
+                <!-- Provider name -->
+                <div class="flex-1">
+                  <h3 class="text-xl font-bold">
+                    {{ group.counterparty.name }}
+                  </h3>
+
+                  <!-- Main provider badge -->
+                  <!-- <span
+                    v-if="isMainCounterparty(group.counterparty.id)"
+                    class="inline-flex items-center mt-1 text-xs bg-white text-red-600 px-2.5 py-1 rounded-full font-bold"
+                  >
+                    <i class="fas fa-check-circle mr-1"></i>
+                    Your Provider
+                  </span> -->
+
+                  <!-- Comparison badge -->
+                  <!-- <span
+                    v-else
+                    class="inline-flex items-center mt-1 text-xs bg-white/30 text-white px-2.5 py-1 rounded-full font-medium"
+                  >
+                    Comparison
+                  </span> -->
+                </div>
+              </div>
+            </div>
+
+            <!-- ========================================= -->
+            <!-- RATES -->
+            <!-- ========================================= -->
+
+            <div class="p-6">
+              <div class="space-y-3">
+                <div
+                  v-for="rate in group.rates"
+                  :key="rate.id"
+                  :class="[
+                    'flex items-center justify-between p-4 rounded-lg',
+
+                    isMainCounterparty(group.counterparty.id) ? 'bg-gray-50' : 'bg-white'
+                  ]"
+                >
+                  <!-- Currency Pair -->
+                  <div class="flex-1">
+                    <div
+                      :class="[
+                        'font-semibold',
+
+                        isMainCounterparty(group.counterparty.id)
+                          ? 'text-gray-900'
+                          : 'text-gray-500'
+                      ]"
+                    >
+                      {{ rate.currency_pair.from_currency }}
+                      <span class="mx-1 text-gray-400">→</span>
+                      {{ rate.currency_pair.to_currency }}
+                    </div>
+
+                    <div
+                      :class="[
+                        'text-xs mt-1',
+
+                        isMainCounterparty(group.counterparty.id)
+                          ? 'text-gray-500'
+                          : 'text-gray-400'
+                      ]"
+                    >
+                      {{ formatDirection(rate.direction) }}
+                    </div>
+                  </div>
+
+                  <!-- Rate -->
+                  <div class="text-right">
+                    <div
+                      :class="[
+                        'text-2xl font-bold font-mono',
+
+                        isMainCounterparty(group.counterparty.id) ? 'text-red-600' : 'text-gray-500'
+                      ]"
+                    >
+                      {{ Number(rate.rate).toFixed(4) }}
+                    </div>
+
+                    <div
+                      :class="[
+                        'text-xs mt-1',
+
+                        isMainCounterparty(group.counterparty.id)
+                          ? 'text-gray-500'
+                          : 'text-gray-400'
+                      ]"
+                    >
+                      per 1 {{ rate.currency_pair.from_currency }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ========================================= -->
+              <!-- PARATUS ACTION -->
+              <!-- ========================================= -->
+
+              <button
+                v-if="isMainCounterparty(group.counterparty.id)"
+                class="w-full mt-6 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+              >
+                <i class="fas fa-arrow-right"></i>
+
+                Send Money with {{ group.counterparty.name }}
+              </button>
+
+              <!-- ========================================= -->
+              <!-- OTHER PROVIDERS - NO ACTION -->
+              <!-- ========================================= -->
+
+              <div v-else class="mt-6 text-center">
+                <span class="text-xs text-gray-400"> Rate comparison only </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No rates -->
+      <div v-else class="bg-white rounded-lg shadow p-8 text-center">
+        <i class="fas fa-chart-line text-4xl text-gray-300 mb-3"></i>
+
+        <p class="text-gray-600">No rates available for {{ formatDate(selectedDate) }}</p>
+      </div>
 
       <!-- Currency Converter -->
       <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -73,7 +252,11 @@
               @change="updateConversion"
               class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg text-sm"
             >
-              <option v-for="pair in availablePairs" :key="`from-${pair.id}`" :value="pair.from_currency">
+              <option
+                v-for="pair in availablePairs"
+                :key="`from-${pair.id}`"
+                :value="pair.from_currency"
+              >
                 {{ pair.from_currency }}
               </option>
             </select>
@@ -107,7 +290,11 @@
               @change="updateConversion"
               class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg text-sm"
             >
-              <option v-for="pair in availablePairs" :key="`to-${pair.id}`" :value="pair.to_currency">
+              <option
+                v-for="pair in availablePairs"
+                :key="`to-${pair.id}`"
+                :value="pair.to_currency"
+              >
                 {{ pair.to_currency }}
               </option>
             </select>
@@ -116,8 +303,10 @@
 
         <div v-if="converterRate" class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <p class="text-sm text-gray-700">
-            <span class="font-semibold">1 {{ converterForm.fromCurrency }}</span> = 
-            <span class="font-semibold text-blue-600">{{ converterRate.toFixed(4) }} {{ converterForm.toCurrency }}</span>
+            <span class="font-semibold">1 {{ converterForm.fromCurrency }}</span> =
+            <span class="font-semibold text-blue-600"
+              >{{ converterRate.toFixed(4) }} {{ converterForm.toCurrency }}</span
+            >
           </p>
         </div>
 
@@ -129,74 +318,9 @@
         </button>
       </div>
 
-      <!-- Exchange Rates by Counterparty -->
-      <div v-if="loading" class="text-center py-12">
-        <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
-      </div>
-
-      <div v-else-if="ratesByCounterparty.length" class="space-y-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Best Rates by Provider</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div
-            v-for="group in filteredRatesByCounterparty"
-            :key="group.counterparty.id"
-            class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-          >
-            <!-- Counterparty Header -->
-            <div class="bg-gradient-to-r from-red-600 to-red-700 p-4 text-white">
-              <div class="flex items-center gap-3 mb-2">
-                <img
-                  v-if="group.counterparty.logo_url"
-                  :src="group.counterparty.logo_url"
-                  :alt="group.counterparty.name"
-                  class="w-10 h-10 object-cover rounded bg-white p-1"
-                />
-                <h3 class="text-lg font-bold">{{ group.counterparty.name }}</h3>
-              </div>
-              <p class="text-red-100 text-sm">{{ group.counterparty.description }}</p>
-            </div>
-
-            <!-- Rates -->
-            <div class="p-6">
-              <div class="space-y-3">
-                <div
-                  v-for="rate in group.rates"
-                  :key="rate.id"
-                  class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100"
-                >
-                  <div class="flex-1">
-                    <div class="font-semibold text-gray-900">
-                      {{ rate.currency_pair.from_currency }} → {{ rate.currency_pair.to_currency }}
-                    </div>
-                    <div class="text-xs text-gray-500 mt-1">
-                      {{ formatDirection(rate.direction) }}
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <div class="text-2xl font-bold text-red-600 font-mono">
-                      {{ rate.rate.toFixed(4) }}
-                    </div>
-                    <div class="text-xs text-gray-500">per 1 {{ rate.currency_pair.from_currency }}</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- CTA -->
-              <button
-                class="w-full mt-6 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
-              >
-                <i class="fas fa-arrow-right"></i>
-                Send Money with {{ group.counterparty.name }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-else class="bg-white rounded-lg shadow p-8 text-center">
-        <p class="text-gray-600">No rates available for {{ formatDate(selectedDate) }}</p>
-      </div>
+   
+      
+   
 
       <!-- Features Section -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-12">
@@ -239,14 +363,25 @@ const {
   selectedDate,
   fetchRatesByDate,
   fetchCounterparties,
-  fetchCurrencyPairs,
-  getRate
+  fetchCurrencyPairs
 } = useExchangeRates()
 
-// Direction state
-const direction = ref('NGN_TO_FOREIGN')
+// =====================================================
+// MAIN COUNTERPARTY
+// =====================================================
 
-// Converter form
+const MAIN_COUNTERPARTY_NAME = 'Paratus'
+
+// =====================================================
+// DIRECTION
+// =====================================================
+
+const direction = ref<'NGN_TO_FOREIGN' | 'FOREIGN_TO_NGN'>('NGN_TO_FOREIGN')
+
+// =====================================================
+// CONVERTER
+// =====================================================
+
 const converterForm = ref({
   fromAmount: '',
   fromCurrency: 'NGN',
@@ -254,52 +389,103 @@ const converterForm = ref({
   toAmount: 0
 })
 
-const converterRate = ref(null)
+const converterRate = ref<number | null>(null)
 
-// Initialize
+// =====================================================
+// INITIALIZE
+// =====================================================
+
 onMounted(async () => {
   await fetchCounterparties()
-  await fetchCurrencyPairs()
   await fetchRatesByDate()
-  
-  // Set default currencies based on direction
+
   updateConverterCurrencies()
 })
 
-// Computed properties
+// =====================================================
+// GET AVAILABLE CURRENCY PAIRS
+// =====================================================
+
 const availablePairs = computed(() => {
-  if (direction.value === 'NGN_TO_FOREIGN') {
-    return rates.value
-      .filter(r => r.currency_pair.from_currency === 'NGN')
-      .map(r => r.currency_pair)
-      .filter((pair, index, self) => 
-        index === self.findIndex(p => p.id === pair.id)
-      )
-  } else {
-    return rates.value
-      .filter(r => r.currency_pair.from_currency !== 'NGN')
-      .map(r => r.currency_pair)
-      .filter((pair, index, self) => 
-        index === self.findIndex(p => p.id === pair.id)
-      )
-  }
+  const pairs = rates.value
+    .filter((rate) => {
+      const from = rate.currency_pair?.from_currency
+      const to = rate.currency_pair?.to_currency
+
+      if (!from || !to) return false
+
+      if (direction.value === 'NGN_TO_FOREIGN') {
+        return from === 'NGN'
+      }
+
+      return from !== 'NGN'
+    })
+    .map((rate) => ({
+      id: rate.currency_pair_id,
+      from_currency: rate.currency_pair.from_currency,
+      to_currency: rate.currency_pair.to_currency
+    }))
+
+  // Remove duplicates
+  return pairs.filter((pair, index, self) => index === self.findIndex((p) => p.id === pair.id))
 })
+
+// =====================================================
+// FILTER + SORT COUNTERPARTY CARDS
+// =====================================================
 
 const filteredRatesByCounterparty = computed(() => {
-  return ratesByCounterparty.value.map(group => ({
-    ...group,
-    rates: group.rates.filter(rate => {
-      if (direction.value === 'NGN_TO_FOREIGN') {
-        return rate.currency_pair.from_currency === 'NGN'
-      } else {
-        return rate.currency_pair.from_currency !== 'NGN'
-      }
-    })
-  })).filter(group => group.rates.length > 0)
+  return (
+    ratesByCounterparty.value
+      .map((group) => ({
+        ...group,
+
+        // Only show rates relevant to selected direction
+        rates: group.rates.filter((rate) => {
+          const fromCurrency = rate.currency_pair?.from_currency
+
+          if (!fromCurrency) return false
+
+          if (direction.value === 'NGN_TO_FOREIGN') {
+            return fromCurrency === 'NGN'
+          }
+
+          return fromCurrency !== 'NGN'
+        })
+      }))
+
+      // Remove counterparties with no rates
+      .filter((group) => group.rates.length > 0)
+
+      // Paratus MUST come first
+      .sort((a, b) => {
+        const aIsMain = a.counterparty?.name?.toLowerCase() === MAIN_COUNTERPARTY_NAME.toLowerCase()
+
+        const bIsMain = b.counterparty?.name?.toLowerCase() === MAIN_COUNTERPARTY_NAME.toLowerCase()
+
+        if (aIsMain && !bIsMain) return -1
+        if (!aIsMain && bIsMain) return 1
+
+        return 0
+      })
+  )
 })
 
-// Methods
-const formatDate = (dateStr) => {
+// =====================================================
+// CHECK IF MAIN COUNTERPARTY
+// =====================================================
+
+const isMainCounterparty = (counterpartyId: string) => {
+  const group = ratesByCounterparty.value.find((group) => group.counterparty?.id === counterpartyId)
+
+  return group?.counterparty?.name?.toLowerCase() === MAIN_COUNTERPARTY_NAME.toLowerCase()
+}
+
+// =====================================================
+// FORMAT DATE
+// =====================================================
+
+const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -308,55 +494,98 @@ const formatDate = (dateStr) => {
   })
 }
 
-const formatDirection = (direction) => {
-  const directionMap = {
-    'BUY': 'Buy rate',
-    'SELL': 'Sell rate',
-    'BOTH': 'Mid-market rate'
+// =====================================================
+// FORMAT RATE DIRECTION
+// =====================================================
+
+const formatDirection = (rateDirection: string) => {
+  const directionMap: Record<string, string> = {
+    BUY: 'Buy rate',
+    SELL: 'Sell rate',
+    BOTH: 'Mid-market rate'
   }
-  return directionMap[direction] || direction
+
+  return directionMap[rateDirection] || rateDirection
 }
+
+// =====================================================
+// SET DEFAULT CURRENCIES
+// =====================================================
 
 const updateConverterCurrencies = () => {
   if (direction.value === 'NGN_TO_FOREIGN') {
     converterForm.value.fromCurrency = 'NGN'
-    converterForm.value.toCurrency = 'GBP'
+
+    // Find first available NGN → foreign pair
+    const pair = availablePairs.value[0]
+
+    converterForm.value.toCurrency = pair?.to_currency || 'GBP'
   } else {
-    converterForm.value.fromCurrency = 'GBP'
+    // Find first foreign → NGN pair
+    const pair = availablePairs.value[0]
+
+    converterForm.value.fromCurrency = pair?.from_currency || 'GBP'
+
     converterForm.value.toCurrency = 'NGN'
   }
+
   updateConversion()
 }
 
+// =====================================================
+// CONVERT
+// =====================================================
+
 const updateConversion = () => {
-  if (!converterForm.value.fromAmount) {
+  const amount = Number(converterForm.value.fromAmount)
+
+  if (!amount || amount <= 0) {
     converterForm.value.toAmount = 0
     converterRate.value = null
     return
   }
 
-  // Find the rate for the selected currency pair
-  const matchingRate = rates.value.find(r =>
-    r.currency_pair.from_currency === converterForm.value.fromCurrency &&
-    r.currency_pair.to_currency === converterForm.value.toCurrency
-  )
+  const matchingRate = rates.value.find((rate) => {
+    const pair = rate.currency_pair
+
+    return (
+      pair?.from_currency === converterForm.value.fromCurrency &&
+      pair?.to_currency === converterForm.value.toCurrency
+    )
+  })
 
   if (matchingRate) {
-    converterRate.value = matchingRate.rate
-    converterForm.value.toAmount = (converterForm.value.fromAmount * matchingRate.rate).toFixed(2)
+    converterRate.value = Number(matchingRate.rate)
+
+    converterForm.value.toAmount = Number((amount * Number(matchingRate.rate)).toFixed(2))
   } else {
     converterRate.value = null
     converterForm.value.toAmount = 0
   }
 }
 
+// =====================================================
+// SWAP
+// =====================================================
+
 const swapCurrencies = () => {
   const temp = converterForm.value.fromCurrency
+
   converterForm.value.fromCurrency = converterForm.value.toCurrency
+
   converterForm.value.toCurrency = temp
+
   updateConversion()
 }
 
-// Watch direction changes
-watch(() => direction.value, updateConverterCurrencies)
+// =====================================================
+// WATCH DIRECTION
+// =====================================================
+
+watch(
+  () => direction.value,
+  () => {
+    updateConverterCurrencies()
+  }
+)
 </script>
