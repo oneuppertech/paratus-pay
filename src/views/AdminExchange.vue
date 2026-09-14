@@ -122,7 +122,7 @@
 
               <v-card-text>
                 <div class="rate-value mb-3">
-                  <span class="text-h5 font-weight-bold">{{ rate.rate.toFixed(4) }}</span>
+                  <span class="text-h5 font-weight-bold">{{ rate.rate.toFixed(2) }}</span>
                 </div>
                 <v-chip :color="directionColor(rate.direction)" size="small" label class="mb-2">
                   {{ rate.direction }}
@@ -350,7 +350,7 @@
                 <div class="info-row">
                   <span class="label">Rate</span>
                   <span class="value font-weight-bold text-h6">
-                    {{ selectedRate.rate.toFixed(4) }}
+                    {{ selectedRate.rate.toFixed(2) }}
                   </span>
                 </div>
               </v-col>
@@ -623,12 +623,13 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model.number="rateForm.rate"
-                label="Rate *"
-                type="number"
-                step="0.0001"
-                variant="outlined"
-              ></v-text-field>
+  v-model.number="rateForm.rate"
+  label="Rate *"
+  type="number"
+  step="0.01"
+  min="0"
+  variant="outlined"
+></v-text-field>
             </v-col>
 
             <v-col cols="12" sm="6">
@@ -972,17 +973,24 @@ const closeRateForm = () => {
 
 const saveRate = async () => {
   try {
-    if (editingRateId.value) {
-      await updateRate(editingRateId.value, {
-        ...rateForm.value,
-        rate_date: selectedDate.value
-      })
-    } else {
-      await createRate({
-        ...rateForm.value,
-        rate_date: selectedDate.value
-      })
+    if (rateForm.value.rate === null || rateForm.value.rate === undefined) {
+      return
     }
+
+    const payload = {
+      counterparty_id: rateForm.value.counterparty_id,
+      currency_pair_id: rateForm.value.currency_pair_id,
+      rate: Number(rateForm.value.rate),
+      direction: rateForm.value.direction,
+      rate_date: selectedDate.value
+    }
+
+    if (editingRateId.value) {
+      await updateRate(editingRateId.value, payload)
+    } else {
+      await createRate(payload)
+    }
+
     await fetchRatesByDate()
     closeRateForm()
   } catch (err) {

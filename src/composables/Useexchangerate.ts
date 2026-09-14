@@ -94,38 +94,59 @@ export const useExchangeRates = () => {
   }
 
   // Create new exchange rate
-  const createRate = async (payload) => {
-    try {
-      const { data, error: err } = await supabase
-        .from('exchange_rates')
-        .insert([payload])
-        .select()
-
-      if (err) throw err
-      return data?.[0]
-    } catch (err) {
-      error.value = err.message
-      throw err
+  // Create new exchange rate
+const createRate = async (payload: any) => {
+  try {
+    const formattedPayload = {
+      ...payload,
+      rate: Number(Number(payload.rate).toFixed(2))
     }
+
+    console.log('Creating exchange rate:', formattedPayload)
+
+    const { data, error: err } = await supabase
+      .from('exchange_rates')
+      .insert([formattedPayload])
+      .select()
+
+    if (err) throw err
+
+    return data?.[0]
+  } catch (err: any) {
+    error.value = err.message
+    throw err
   }
+}
 
-  // Update exchange rate
-  const updateRate = async (id, updates) => {
-    try {
-      const { data, error: err } = await supabase
-        .from('exchange_rates')
-        .update(updates)
-        .eq('id', id)
-        .select()
-
-      if (err) throw err
-      return data?.[0]
-    } catch (err) {
-      error.value = err.message
-      throw err
+// Update exchange rate
+const updateRate = async (id: string, updates: any) => {
+  try {
+    const formattedUpdates = {
+      ...updates,
+      rate:
+        updates.rate !== undefined && updates.rate !== null
+          ? Number(Number(updates.rate).toFixed(2))
+          : updates.rate
     }
-  }
 
+    console.log('Updating exchange rate:', formattedUpdates)
+
+    const { data, error: err } = await supabase
+      .from('exchange_rates')
+      .update(formattedUpdates)
+      .eq('id', id)
+      .select()
+
+    if (err) throw err
+
+    return data?.[0]
+  } catch (err: any) {
+    error.value = err.message
+    throw err
+  }
+}
+
+  
   // Delete exchange rate
   const deleteRate = async (id) => {
     try {
