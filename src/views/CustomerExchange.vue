@@ -3,9 +3,8 @@
     <div class="max-w-7xl mx-auto px-4">
       <!-- Header -->
       <div class="mb-8">
-        <img src="../assets/paratus-logo.png" class="w-25" alt="">
+        <img src="../assets/paratus-logo.png" class="w-25" alt="" />
         <div class="flex items-center gap-3 mb-4">
-          
           <div>
             <h1 class="text-xl font-bold text-gray-900">Exchange Rates</h1>
             <p class="text-gray-600">
@@ -57,8 +56,6 @@
       </div>
 
       <div v-else-if="filteredRatesByCounterparty.length" class="space-y-6">
-        
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Counterparty Card -->
           <div
@@ -205,9 +202,10 @@
 
               <button
                 v-if="isMainCounterparty(group.counterparty.id)"
+                @click="sendMoneyWithParatus(group)"
                 class="w-full mt-6 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
               >
-                <i class="fas fa-arrow-right"></i>
+                <i class="fab fa-whatsapp text-lg"></i>
 
                 Send Money with {{ group.counterparty.name }}
               </button>
@@ -318,10 +316,6 @@
           <i class="fas fa-paper-plane mr-2"></i>Proceed to Exchange
         </button>
       </div>
-
-   
-      
-   
 
       <!-- Features Section -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-12">
@@ -536,7 +530,29 @@ const updateConverterCurrencies = () => {
 // =====================================================
 // CONVERT
 // =====================================================
+const sendMoneyWithParatus = (group: any) => {
+  // Get the first displayed rate for Paratus
+  const rate = group.rates?.[0]
 
+  if (!rate) return
+
+  const fromCurrency = rate.currency_pair?.from_currency
+  const toCurrency = rate.currency_pair?.to_currency
+  const exchangeRate = Number(rate.rate).toFixed(4)
+
+  const message = `Hello Paratus,
+
+I would like to send money with Paratus.
+
+Currency: ${fromCurrency} → ${toCurrency}
+Exchange Rate: ${exchangeRate} ${toCurrency} per 1 ${fromCurrency}
+
+Please assist me with the next steps.`
+
+  const whatsappUrl = `https://wa.me/+2348025253804?text=${encodeURIComponent(message)}`
+
+  window.open(whatsappUrl, '_blank')
+}
 const updateConversion = () => {
   const amount = Number(converterForm.value.fromAmount)
 
