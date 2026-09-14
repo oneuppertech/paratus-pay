@@ -51,271 +51,314 @@
       </div>
 
       <!-- Exchange Rates by Counterparty -->
-      <div v-if="loading" class="text-center py-12">
-        <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
-      </div>
+<div v-if="loading" class="text-center py-12">
+  <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+</div>
 
-      <div v-else-if="filteredRatesByCounterparty.length" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Counterparty Card -->
-          <div
-            v-for="group in filteredRatesByCounterparty"
-            :key="group.counterparty.id"
-            :class="[
-              'rounded-xl overflow-hidden transition-all duration-300',
+<div v-else-if="filteredRatesByCounterparty.length" class="space-y-6">
 
-              isMainCounterparty(group.counterparty.id)
-                ? 'bg-white shadow-xl border-2 border-red-600'
-                : 'bg-gray-100 border border-gray-200 opacity-60'
-            ]"
-          >
-            <!-- ========================================= -->
-            <!-- HEADER -->
-            <!-- ========================================= -->
-
-            <div
-              :class="[
-                'p-5',
-
-                isMainCounterparty(group.counterparty.id)
-                  ? 'bg-gradient-to-r from-red-600 to-red-700 text-white'
-                  : 'bg-gray-400 text-white'
-              ]"
-            >
-              <div class="flex items-center gap-3">
-                <!-- Logo -->
-                <div
-                  class="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-white"
-                >
-                  <img
-                    v-if="group.counterparty.logo_url"
-                    :src="group.counterparty.logo_url"
-                    :alt="group.counterparty.name"
-                    class="w-full h-full object-contain p-1"
-                  />
-
-                  <span v-else class="text-gray-500 font-bold text-lg">
-                    {{ group.counterparty.name?.charAt(0) }}
-                  </span>
-                </div>
-
-                <!-- Provider name -->
-                <div class="flex-1">
-                  <h3 class="text-xl font-bold">
-                    {{ group.counterparty.name }}
-                  </h3>
-
-                  <!-- Main provider badge -->
-                  <!-- <span
-                    v-if="isMainCounterparty(group.counterparty.id)"
-                    class="inline-flex items-center mt-1 text-xs bg-white text-red-600 px-2.5 py-1 rounded-full font-bold"
-                  >
-                    <i class="fas fa-check-circle mr-1"></i>
-                    Your Provider
-                  </span> -->
-
-                  <!-- Comparison badge -->
-                  <!-- <span
-                    v-else
-                    class="inline-flex items-center mt-1 text-xs bg-white/30 text-white px-2.5 py-1 rounded-full font-medium"
-                  >
-                    Comparison
-                  </span> -->
-                </div>
-              </div>
-            </div>
-
-            <!-- ========================================= -->
-            <!-- RATES -->
-            <!-- ========================================= -->
-
-            <div class="p-6">
-              <div class="space-y-3">
-                <div
-                  v-for="rate in group.rates"
-                  :key="rate.id"
-                  :class="[
-                    'flex items-center justify-between p-4 rounded-lg',
-
-                    isMainCounterparty(group.counterparty.id) ? 'bg-gray-50' : 'bg-white'
-                  ]"
-                >
-                  <!-- Currency Pair -->
-                  <div class="flex-1">
-                    <div
-                      :class="[
-                        'font-semibold',
-
-                        isMainCounterparty(group.counterparty.id)
-                          ? 'text-gray-900'
-                          : 'text-gray-500'
-                      ]"
-                    >
-                      {{ rate.currency_pair.from_currency }}
-                      <span class="mx-1 text-gray-400">→</span>
-                      {{ rate.currency_pair.to_currency }}
-                    </div>
-
-                    <div
-                      :class="[
-                        'text-xs mt-1',
-
-                        isMainCounterparty(group.counterparty.id)
-                          ? 'text-gray-500'
-                          : 'text-gray-400'
-                      ]"
-                    >
-                      {{ formatDirection(rate.direction) }}
-                    </div>
-                  </div>
-
-                  <!-- Rate -->
-                  <div class="text-right">
-                    <div
-                      :class="[
-                        'text-2xl font-bold font-mono',
-
-                        isMainCounterparty(group.counterparty.id) ? 'text-red-600' : 'text-gray-500'
-                      ]"
-                    >
-                      {{ Number(rate.rate).toFixed(4) }}
-                    </div>
-
-                    <div
-                      :class="[
-                        'text-xs mt-1',
-
-                        isMainCounterparty(group.counterparty.id)
-                          ? 'text-gray-500'
-                          : 'text-gray-400'
-                      ]"
-                    >
-                      per 1 {{ rate.currency_pair.from_currency }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- ========================================= -->
-              <!-- PARATUS ACTION -->
-              <!-- ========================================= -->
-
-              <button
-                v-if="isMainCounterparty(group.counterparty.id)"
-                @click="sendMoneyWithParatus(group)"
-                class="w-full mt-6 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
-              >
-                <i class="fab fa-whatsapp text-lg"></i>
-
-                Send Money with {{ group.counterparty.name }}
-              </button>
-
-              <!-- ========================================= -->
-              <!-- OTHER PROVIDERS - NO ACTION -->
-              <!-- ========================================= -->
-
-              <div v-else class="mt-6 text-center">
-                <span class="text-xs text-gray-400"> Rate comparison only </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- No rates -->
-      <div v-else class="bg-white rounded-lg shadow p-8 text-center">
-        <i class="fas fa-chart-line text-4xl text-gray-300 mb-3"></i>
-
-        <p class="text-gray-600">No rates available for {{ formatDate(selectedDate) }}</p>
-      </div>
-
-      <!-- Currency Converter -->
-      <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-xl font-bold text-gray-900 mb-6">Currency Converter</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-          <!-- From Currency -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">From</label>
-            <div class="relative">
-              <input
-                v-model.number="converterForm.fromAmount"
-                type="number"
-                step="0.01"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                placeholder="Enter amount"
-              />
-            </div>
-            <select
-              v-model="converterForm.fromCurrency"
-              @change="updateConversion"
-              class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              <option
-                v-for="pair in availablePairs"
-                :key="`from-${pair.id}`"
-                :value="pair.from_currency"
-              >
-                {{ pair.from_currency }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Swap Button -->
-          <div class="flex justify-center">
-            <button
-              @click="swapCurrencies"
-              class="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-md transition-all transform hover:scale-110"
-              title="Swap currencies"
-            >
-              <i class="fas fa-exchange-alt"></i>
-            </button>
-          </div>
-
-          <!-- To Currency -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">To</label>
-            <div class="relative">
-              <input
-                :value="converterForm.toAmount"
-                type="number"
-                disabled
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold"
-                placeholder="0.00"
-              />
-            </div>
-            <select
-              v-model="converterForm.toCurrency"
-              @change="updateConversion"
-              class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              <option
-                v-for="pair in availablePairs"
-                :key="`to-${pair.id}`"
-                :value="pair.to_currency"
-              >
-                {{ pair.to_currency }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div v-if="converterRate" class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p class="text-sm text-gray-700">
-            <span class="font-semibold">1 {{ converterForm.fromCurrency }}</span> =
-            <span class="font-semibold text-blue-600"
-              >{{ converterRate.toFixed(4) }} {{ converterForm.toCurrency }}</span
-            >
-          </p>
-        </div>
-
-        <button
-          v-if="converterForm.fromAmount > 0"
-          class="w-full mt-6 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all"
+  <!-- ========================================= -->
+  <!-- PARATUS - ALWAYS FIRST -->
+  <!-- ========================================= -->
+  <div
+    v-if="paratusGroup"
+    class="rounded-xl overflow-hidden transition-all duration-300 bg-white shadow-xl border-2 border-red-600"
+  >
+    <!-- HEADER -->
+    <div class="p-5 bg-gradient-to-r from-red-600 to-red-700 text-white">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-white"
         >
-          <i class="fas fa-paper-plane mr-2"></i>Proceed to Exchange
+          <img
+            v-if="paratusGroup.counterparty.logo_url"
+            :src="paratusGroup.counterparty.logo_url"
+            :alt="paratusGroup.counterparty.name"
+            class="w-full h-full object-contain p-1"
+          />
+
+          <span v-else class="text-gray-500 font-bold text-lg">
+            {{ paratusGroup.counterparty.name?.charAt(0) }}
+          </span>
+        </div>
+
+        <div class="flex-1">
+          <h3 class="text-xl font-bold">
+            {{ paratusGroup.counterparty.name }}
+          </h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- RATES -->
+    <div class="p-6">
+      <div class="space-y-3">
+        <div
+          v-for="rate in paratusGroup.rates"
+          :key="rate.id"
+          class="flex items-center justify-between p-4 rounded-lg bg-gray-50"
+        >
+          <!-- Currency Pair -->
+          <div class="flex-1">
+            <div class="font-semibold text-gray-900">
+              {{ rate.currency_pair.from_currency }}
+              <span class="mx-1 text-gray-400">→</span>
+              {{ rate.currency_pair.to_currency }}
+            </div>
+
+            <div class="text-xs mt-1 text-gray-500">
+              {{ formatDirection(rate.direction) }}
+            </div>
+          </div>
+
+          <!-- Rate -->
+          <div class="text-right">
+            <div class="text-2xl font-bold font-mono text-red-600">
+              {{ Number(rate.rate).toFixed(4) }}
+            </div>
+
+            <div class="text-xs mt-1 text-gray-500">
+              per 1 {{ rate.currency_pair.from_currency }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARATUS ACTION -->
+      <button
+        @click="sendMoneyWithParatus(paratusGroup)"
+        class="w-full mt-6 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+      >
+        <i class="fab fa-whatsapp text-lg"></i>
+        Send Money with {{ paratusGroup.counterparty.name }}
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- CURRENCY CONVERTER -->
+  <!-- ========================================= -->
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-xl font-bold text-gray-900 mb-6">
+      Currency Converter
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+
+      <!-- From Currency -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          From
+        </label>
+
+        <input
+          v-model.number="converterForm.fromAmount"
+          type="number"
+          step="0.01"
+          @input="updateConversion"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+          placeholder="Enter amount"
+        />
+
+        <select
+          v-model="converterForm.fromCurrency"
+          @change="updateConversion"
+          class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg text-sm"
+        >
+          <option
+            v-for="pair in availablePairs"
+            :key="`from-${pair.id}`"
+            :value="pair.from_currency"
+          >
+            {{ pair.from_currency }}
+          </option>
+        </select>
+      </div>
+
+
+      <!-- Swap Button -->
+      <div class="flex justify-center">
+        <button
+          @click="swapCurrencies"
+          class="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-md transition-all transform hover:scale-110"
+          title="Swap currencies"
+        >
+          <i class="fas fa-exchange-alt"></i>
         </button>
       </div>
+
+
+      <!-- To Currency -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          To
+        </label>
+
+        <input
+          :value="converterForm.toAmount"
+          type="number"
+          disabled
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold"
+          placeholder="0.00"
+        />
+
+        <select
+          v-model="converterForm.toCurrency"
+          @change="updateConversion"
+          class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg text-sm"
+        >
+          <option
+            v-for="pair in availablePairs"
+            :key="`to-${pair.id}`"
+            :value="pair.to_currency"
+          >
+            {{ pair.to_currency }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+
+    <!-- Conversion Rate -->
+    <div
+      v-if="converterRate"
+      class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200"
+    >
+      <p class="text-sm text-gray-700">
+        <span class="font-semibold">
+          1 {{ converterForm.fromCurrency }}
+        </span>
+        =
+        <span class="font-semibold text-blue-600">
+          {{ converterRate.toFixed(4) }}
+          {{ converterForm.toCurrency }}
+        </span>
+      </p>
+    </div>
+
+
+    <!-- Proceed -->
+    <button
+      v-if="converterForm.fromAmount > 0"
+      class="w-full mt-6 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all"
+    >
+      <i class="fas fa-paper-plane mr-2"></i>
+      Proceed to Exchange
+    </button>
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- OTHER PROVIDERS -->
+  <!-- ========================================= -->
+  <div
+    v-if="otherProviderGroups.length"
+    class="grid grid-cols-1 md:grid-cols-2 gap-6"
+  >
+    <h1 class="text-md font-semibold text-gray-900">Other Apps Exchange Rates</h1>
+    <div
+      v-for="group in otherProviderGroups"
+      :key="group.counterparty.id"
+      class="rounded-xl overflow-hidden transition-all duration-300 bg-gray-100 border border-gray-200 opacity-60"
+    >
+
+      <!-- HEADER -->
+      <div class="p-5 bg-gray-400 text-white">
+        <div class="flex items-center gap-3">
+
+          <div
+            class="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-white"
+          >
+            <img
+              v-if="group.counterparty.logo_url"
+              :src="group.counterparty.logo_url"
+              :alt="group.counterparty.name"
+              class="w-full h-full object-contain p-1"
+            />
+
+            <span v-else class="text-gray-500 font-bold text-lg">
+              {{ group.counterparty.name?.charAt(0) }}
+            </span>
+          </div>
+
+          <div class="flex-1">
+            <h3 class="text-xl font-bold">
+              {{ group.counterparty.name }}
+            </h3>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- RATES -->
+      <div class="p-6">
+        <div class="space-y-3">
+
+          <div
+            v-for="rate in group.rates"
+            :key="rate.id"
+            class="flex items-center justify-between p-4 rounded-lg bg-white"
+          >
+
+            <!-- Currency Pair -->
+            <div class="flex-1">
+              <div class="font-semibold text-gray-500">
+                {{ rate.currency_pair.from_currency }}
+
+                <span class="mx-1 text-gray-400">
+                  →
+                </span>
+
+                {{ rate.currency_pair.to_currency }}
+              </div>
+
+              <div class="text-xs mt-1 text-gray-400">
+                {{ formatDirection(rate.direction) }}
+              </div>
+            </div>
+
+
+            <!-- Rate -->
+            <div class="text-right">
+              <div class="text-2xl font-bold font-mono text-gray-500">
+                {{ Number(rate.rate).toFixed(4) }}
+              </div>
+
+              <div class="text-xs mt-1 text-gray-400">
+                per 1 {{ rate.currency_pair.from_currency }}
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="mt-6 text-center">
+          <span class="text-xs text-gray-400">
+            Rate comparison only
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- No rates -->
+<div
+  v-else
+  class="bg-white rounded-lg shadow p-8 text-center"
+>
+  <i class="fas fa-chart-line text-4xl text-gray-300 mb-3"></i>
+
+  <p class="text-gray-600">
+    No rates available for {{ formatDate(selectedDate) }}
+  </p>
+</div>
 
       <!-- Features Section -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-12">
@@ -605,4 +648,26 @@ watch(
     updateConverterCurrencies()
   }
 )
+
+// =====================================================
+// PARATUS GROUP
+// =====================================================
+const paratusGroup = computed(() => {
+  return filteredRatesByCounterparty.value.find(
+    (group) =>
+      group.counterparty?.name?.toLowerCase() ===
+      MAIN_COUNTERPARTY_NAME.toLowerCase()
+  )
+})
+
+// =====================================================
+// OTHER PROVIDERS
+// =====================================================
+const otherProviderGroups = computed(() => {
+  return filteredRatesByCounterparty.value.filter(
+    (group) =>
+      group.counterparty?.name?.toLowerCase() !==
+      MAIN_COUNTERPARTY_NAME.toLowerCase()
+  )
+})
 </script>
