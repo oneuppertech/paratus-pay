@@ -114,7 +114,7 @@
           <!-- Rate -->
           <div class="text-right">
             <div class="text-2xl font-bold font-mono text-red-600">
-              {{ Number(rate.rate).toFixed(4) }}
+              {{ Number(rate.rate) }}
             </div>
 
             <div class="text-xs mt-1 text-gray-500">
@@ -231,7 +231,7 @@
         </span>
         =
         <span class="font-semibold text-blue-600">
-          {{ converterRate.toFixed(4) }}
+          {{ converterRate }}
           {{ converterForm.toCurrency }}
         </span>
       </p>
@@ -581,7 +581,7 @@ const sendMoneyWithParatus = (group: any) => {
 
   const fromCurrency = rate.currency_pair?.from_currency
   const toCurrency = rate.currency_pair?.to_currency
-  const exchangeRate = Number(rate.rate).toFixed(4)
+  const exchangeRate = Number(rate.rate)
 
   const message = `Hello Paratus,
 
@@ -617,7 +617,7 @@ const updateConversion = () => {
   if (matchingRate) {
     converterRate.value = Number(matchingRate.rate)
 
-    converterForm.value.toAmount = Number((amount * Number(matchingRate.rate)).toFixed(2))
+    converterForm.value.toAmount = Number((amount * Number(matchingRate.rate)))
   } else {
     converterRate.value = null
     converterForm.value.toAmount = 0
