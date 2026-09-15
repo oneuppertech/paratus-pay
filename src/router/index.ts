@@ -16,6 +16,11 @@ const router = createRouter({
   routes: [
     // Landing page
     {
+      path: '/',
+      name: 'customer',
+      component: CustomerExchange,
+    },
+    {
       path: '/landing',
       name: 'landing',
       component: LandingPage,
@@ -24,11 +29,6 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: AdminExchange,
-    },
-    {
-      path: '/customer',
-      name: 'customer',
-      component: CustomerExchange,
     },
 
     // Onboarding
