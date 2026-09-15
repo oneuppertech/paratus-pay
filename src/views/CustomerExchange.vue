@@ -323,7 +323,7 @@
             <!-- Rate -->
             <div class="text-right">
               <div class="text-2xl font-bold font-mono text-gray-500">
-                {{ Number(rate.rate).toFixed(4) }}
+                {{ Number(rate.rate) }}
               </div>
 
               <div class="text-xs mt-1 text-gray-400">
