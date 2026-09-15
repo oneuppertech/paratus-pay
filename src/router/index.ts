@@ -29,44 +29,7 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: AdminExchange,
-    },
-
-    // Onboarding
-    {
-      path: '/',
-      component: Onboarding,
-
-      children: [
-        {
-          path: '',
-          redirect: { name: 'onboarding-profile' },
-        },
-
-        {
-          path: 'onboarding-profile',
-          name: 'onboarding-profile',
-          component: StepProfile,
-        },
-
-        {
-          path: 'onboarding-identity',
-          name: 'onboarding-identity',
-          component: StepIdentity,
-        },
-
-        {
-          path: 'onboarding-address',
-          name: 'onboarding-address',
-          component: Stepaddress,
-        },
-
-        {
-          path: 'onboarding-verify',
-          name: 'onboarding-verify',
-          component: Stepverify,
-        },
-      ],
-    },
+    }
   ],
 })
 
